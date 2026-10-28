@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+*.pyc
+Lanelet2-master/
+JSOM/
+outputs/faulty/
