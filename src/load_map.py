@@ -12,6 +12,8 @@ import lanelet2.projection
 import lanelet2.routing
 import lanelet2.traffic_rules
 
+from checks import direction_and_bound_midpoints
+
 MAP_PATH = Path(__file__).resolve().parent.parent / "map" / "annotations.osm"
 
 # Lanelet2's own convention for linestring "type" tags (lanelet2_core/Attribute.h).
@@ -108,18 +110,6 @@ def check_tag_conventions(lanelet_map):
     return flagged
 
 
-def _direction_and_bound_midpoints(lanelet):
-    """Travel direction (start-to-end, averaged over both bounds) and each bound's midpoint, in projected meters."""
-    left = list(lanelet.leftBound)
-    right = list(lanelet.rightBound)
-    d_left = (left[-1].x - left[0].x, left[-1].y - left[0].y)
-    d_right = (right[-1].x - right[0].x, right[-1].y - right[0].y)
-    direction = ((d_left[0] + d_right[0]) / 2, (d_left[1] + d_right[1]) / 2)
-    left_mid = (sum(p.x for p in left) / len(left), sum(p.y for p in left) / len(left))
-    right_mid = (sum(p.x for p in right) / len(right), sum(p.y for p in right) / len(right))
-    return direction, left_mid, right_mid
-
-
 def check_bound_sides_and_direction(lanelet_map):
     """For each lanelet: is the tagged left bound geometrically left of travel, and does travel run northwest?
 
@@ -129,7 +119,7 @@ def check_bound_sides_and_direction(lanelet_map):
     """
     results = {}
     for ll in lanelet_map.laneletLayer:
-        direction, left_mid, right_mid = _direction_and_bound_midpoints(ll)
+        direction, left_mid, right_mid = direction_and_bound_midpoints(ll)
         v = (left_mid[0] - right_mid[0], left_mid[1] - right_mid[1])
         cross = direction[0] * v[1] - direction[1] * v[0]
         results[ll.id] = {

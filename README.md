@@ -28,9 +28,13 @@ Run commands:
 ```bash
 docker build -t josm-qa .
 docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/load_map.py
+docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/run_qa.py
 ```
 
 (Or skip the build and run directly: `docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work python:3.11-slim bash -c "pip install -r requirements.txt && python3 src/load_map.py"`.)
+
+`run_qa.py` runs all the checks in `docs/checks.md` and writes `outputs/issues.geojson` and
+`outputs/issues.csv`. The clean map currently produces zero issues.
 
 ## Limitations
 
