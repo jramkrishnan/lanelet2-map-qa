@@ -50,7 +50,7 @@
   <way id='-883' action='modify' visible='true'>
     <nd ref='-26317' />
     <nd ref='-26318' />
-    <tag k='type' v='stopline' />
+    <tag k='type' v='stop_line' />
   </way>
   <way id='-936' action='modify' visible='true'>
     <nd ref='-26332' />
