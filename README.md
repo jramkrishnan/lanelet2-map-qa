@@ -31,6 +31,7 @@ docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 
 docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/run_qa.py
 docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/inject_faults.py --trials 30 --seed 42
 docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/evaluate.py
+docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 -m pytest -q tests
 ```
 
 (Or skip the build and run directly: `docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work python:3.11-slim bash -c "pip install -r requirements.txt && python3 src/load_map.py"`.)
@@ -99,6 +100,39 @@ faulty runs, and issue density per 100 m of lane.
    run, or leave it unfiltered to see where issues cluster.
 8. Label lanelets with `lanelet_id` and `width_m`.
 9. *Project → Import/Export → Export Map to Image* → `outputs/figures/qgis_map.png`.
+
+## Route demo (ROS 2)
+
+![Route from the approach lanelet through the intersection to the exit](outputs/figures/route.png)
+
+`src/plot_route.py` plans a route with `lanelet2.routing` (shortest path from the lanelet with no
+predecessor to the lanelet with no successor) and draws it over the map: `-82 -> -78 -> -71`,
+approach to intersection to exit, heading northwest toward the 16th Street Bridge.
+
+```bash
+docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/plot_route.py
+```
+
+`ros/lanelet_marker_node.py` is a ROS 2 Jazzy node that publishes the same map and route as a
+`visualization_msgs/MarkerArray` on `/lanelet_markers` (frame `map`, latched). It runs headless
+in Docker, which is how it was verified:
+
+```bash
+docker build -t josm-ros -f Dockerfile.ros .
+docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-ros bash -c \
+  "source /opt/ros/jazzy/setup.bash && python3 ros/lanelet_marker_node.py"
+```
+
+RViz2 was **not** run on this Mac: RoboStack segfaults here (see Setup), and RViz inside an
+emulated amd64 container would need X11 forwarding and software OpenGL. To see it in RViz2 and
+record a GIF, use the Ubuntu VM (with its desktop):
+
+1. `sudo apt install ros-jazzy-desktop ros-jazzy-lanelet2-python ros-jazzy-lanelet2-projection`
+   (after adding the ROS 2 apt repo, as in `Dockerfile.ros`).
+2. Terminal 1: `source /opt/ros/jazzy/setup.bash && python3 ros/lanelet_marker_node.py`
+3. Terminal 2: `source /opt/ros/jazzy/setup.bash && rviz2`
+4. In RViz2: set *Fixed Frame* to `map`, then *Add → By topic → /lanelet_markers → MarkerArray*.
+5. Record with Peek or `byzanz-record` and save to `outputs/figures/rviz_route.gif`.
 
 ## Limitations
 
