@@ -77,17 +77,23 @@ def direction_and_bound_midpoints(lanelet):
 
 
 def lanelet_average_width(lanelet, samples=5):
-    """Average distance between left and right bound, sampled at even fractions of each
-    bound's own length (so it works even when the two bounds have different vertex counts)."""
-    left, right = lanelet.leftBound, lanelet.rightBound
-    left_len = lanelet2.geometry.length(left)
-    right_len = lanelet2.geometry.length(right)
+    """Average perpendicular width: sample points evenly along each bound and measure each
+    one's shortest distance to the opposite bound.
+
+    An earlier version paired points at equal fractions of each bound's length. That measures
+    diagonally when the bounds start at different places along the road (the approach lanelet's
+    curb starts ~4 m before its painted line), so it overstated width and missed a lane narrowed
+    to 2 m. Fault injection found this; see outputs/eval.md.
+    """
+    left = lanelet2.geometry.to2D(lanelet.leftBound)
+    right = lanelet2.geometry.to2D(lanelet.rightBound)
     widths = []
-    for i in range(samples):
-        t = i / (samples - 1) if samples > 1 else 0.5
-        lp = lanelet2.geometry.interpolatedPointAtDistance(left, t * left_len)
-        rp = lanelet2.geometry.interpolatedPointAtDistance(right, t * right_len)
-        widths.append(lanelet2.geometry.distance(lp, rp))
+    for this_bound, other_bound in ((left, right), (right, left)):
+        bound_len = lanelet2.geometry.length(this_bound)
+        for i in range(samples):
+            t = i / (samples - 1) if samples > 1 else 0.5
+            point = lanelet2.geometry.interpolatedPointAtDistance(this_bound, t * bound_len)
+            widths.append(lanelet2.geometry.distance(point, other_bound))
     return sum(widths) / len(widths)
 
 

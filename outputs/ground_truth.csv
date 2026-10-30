@@ -1,0 +1,31 @@
+trial_id,fault_type,primitive_type,primitive_id,expected_check,detail
+1,remove_stop_line_ref,regulatory_element,-87,traffic_light_missing_stop_line,removed ref_line member
+2,shift_endpoint,lanelet,-78,connection_gap,right end shifted 0.87 m away from successor -71
+3,remove_speed_limit,lanelet,-71,missing_speed_limit,removed speed_limit tag
+4,swap_left_right,lanelet,-82,left_right_swapped,swapped left/right member roles
+5,narrow_lanelet,lanelet,-82,lane_width_outlier,left bound moved to 2.0 m from right bound
+6,detach_regulatory_element,lanelet,-82,lanelet_missing_regulatory_element,removed regulatory_element member
+7,detach_successor,lanelet,-82,connection_gap,"end nodes duplicated, no longer shared with successor -78"
+8,remove_stop_line_ref,regulatory_element,-87,traffic_light_missing_stop_line,removed ref_line member
+9,shift_endpoint,lanelet,-78,connection_gap,left end shifted 0.83 m away from successor -71
+10,remove_speed_limit,lanelet,-71,missing_speed_limit,removed speed_limit tag
+11,swap_left_right,lanelet,-82,left_right_swapped,swapped left/right member roles
+12,narrow_lanelet,lanelet,-71,lane_width_outlier,left bound moved to 2.0 m from right bound
+13,detach_regulatory_element,lanelet,-82,lanelet_missing_regulatory_element,removed regulatory_element member
+14,detach_successor,lanelet,-78,connection_gap,"end nodes duplicated, no longer shared with successor -71"
+15,remove_stop_line_ref,regulatory_element,-87,traffic_light_missing_stop_line,removed ref_line member
+16,shift_endpoint,lanelet,-82,connection_gap,left end shifted 1.64 m away from successor -78
+17,remove_speed_limit,lanelet,-78,missing_speed_limit,removed speed_limit tag
+18,swap_left_right,lanelet,-78,left_right_swapped,swapped left/right member roles
+19,narrow_lanelet,lanelet,-78,lane_width_outlier,left bound moved to 2.0 m from right bound
+20,detach_regulatory_element,lanelet,-82,lanelet_missing_regulatory_element,removed regulatory_element member
+21,detach_successor,lanelet,-78,connection_gap,"end nodes duplicated, no longer shared with successor -71"
+22,remove_stop_line_ref,regulatory_element,-87,traffic_light_missing_stop_line,removed ref_line member
+23,shift_endpoint,lanelet,-78,connection_gap,left end shifted 1.07 m away from successor -71
+24,remove_speed_limit,lanelet,-78,missing_speed_limit,removed speed_limit tag
+25,swap_left_right,lanelet,-82,left_right_swapped,swapped left/right member roles
+26,narrow_lanelet,lanelet,-78,lane_width_outlier,left bound moved to 2.0 m from right bound
+27,detach_regulatory_element,lanelet,-82,lanelet_missing_regulatory_element,removed regulatory_element member
+28,detach_successor,lanelet,-82,connection_gap,"end nodes duplicated, no longer shared with successor -78"
+29,remove_stop_line_ref,regulatory_element,-87,traffic_light_missing_stop_line,removed ref_line member
+30,shift_endpoint,lanelet,-82,connection_gap,left end shifted 1.33 m away from successor -78

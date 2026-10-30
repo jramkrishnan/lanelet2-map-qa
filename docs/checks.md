@@ -65,8 +65,11 @@ the map — pedestrians could be crossing there and the AV stack would never kno
 
 ## lane_width_outlier (warning)
 
-A road lanelet whose average width (sampled at 5 points along each bound's own length, since
-left and right bounds don't need the same number of vertices) falls outside 2.5–4.5 m.
+A road lanelet whose average width falls outside 2.5–4.5 m. Width is measured perpendicular to
+the lane: 5 points are sampled along each bound and each one's shortest distance to the opposite
+bound is taken. (The first version paired points at equal fractions of each bound's length. That
+measured diagonally when the curb and painted line start at different places, and it missed a
+lane narrowed to 2 m. Phase C's fault injection caught this; see `outputs/eval.md`.)
 
 **Why it matters:** a width outside this range is usually a digitizing mistake — a bound drawn
 against the wrong curb, or a lane pinched by a misplaced node — rather than a real road. It's a
@@ -100,7 +103,7 @@ direction instead of leaving a geometric mismatch for the cross-product check to
 flipped direction then broke the lanelet's connection to its neighbor, so the fault surfaced as
 `unreachable_lanelet`, not `left_right_swapped`. Both checks are doing their job correctly here;
 it's just that this particular fault's symptom depends on whether the lanelet has a routing
-neighbor at all. This is called out again in `outputs/eval.md` once Phase C's fault injection
+neighbor at all. This is called out again in `outputs/eval.md`, where Phase C's fault injection
 runs this scenario for real.
 
 **Why it matters:** if left/right are swapped, anything that reasons about lane position (lane
