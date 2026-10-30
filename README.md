@@ -62,6 +62,44 @@ check (diagonal rather than perpendicular measurement), which has been fixed. Al
 outside ground truth are real knock-on effects on neighboring lanelets. Details for every trial
 are in `outputs/eval.md`.
 
+## GIS layer
+
+```bash
+docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work josm-qa python3 src/export_gis.py
+bash sql/load_postgis.sh   # optional: PostGIS in Docker, loads the GeoPackage, runs sql/0*.sql
+```
+
+`export_gis.py` writes two GeoPackages with the same layers:
+`outputs/map_qa.gpkg` (EPSG:4326, for viewing) and `outputs/map_qa_2272.gpkg` (EPSG:2272, PA
+South in US survey feet, for measuring lengths and areas).
+
+| Layer | Geometry | What it holds |
+|---|---|---|
+| `lanelets` | polygon | tags, width (m), length (m), predecessors/successors, regulatory elements |
+| `centerlines` | line | one per lanelet, drawn in the travel direction |
+| `boundaries` | line | every linestring: curbs, lane lines, virtual bounds, stop line, traffic light |
+| `regulatory_elements` | multiline | the light and stop line of each regulatory element, plus attached lanelets |
+| `issues` | point | QA issues on the clean map (currently empty) |
+| `faulty_issues` | point | QA issues from all 30 faulty copies, with `trial_id` |
+
+The SQL queries in `sql/` cast to `geography` so distances come back in meters:
+total lane length, lanelets within 30 m of a traffic light, issues per lanelet across the
+faulty runs, and issue density per 100 m of lane.
+
+### QGIS checklist (built by hand)
+
+1. Add a basemap: *XYZ Tiles* → Esri World Imagery (the same imagery the map was annotated on).
+2. *Layer → Add Layer → Add Vector Layer* → `outputs/map_qa.gpkg` and select all layers.
+3. Set the project CRS to EPSG:2272 (or 3857) so the map isn't stretched.
+4. `lanelets`: semi-transparent fill, *Categorized* by `lanelet_id`.
+5. `boundaries`: *Categorized* by `type`. Solid line for `curbstone`, dashed for `line_thin`,
+   dotted grey for `virtual`, thick red for `stop_line`, a marker for `traffic_light`.
+6. `centerlines`: line with an arrow marker at the end, to show travel direction.
+7. `faulty_issues`: *Categorized* by `check`. Add a filter such as `"trial_id" = 23` to show one
+   run, or leave it unfiltered to see where issues cluster.
+8. Label lanelets with `lanelet_id` and `width_m`.
+9. *Project → Import/Export → Export Map to Image* → `outputs/figures/qgis_map.png`.
+
 ## Limitations
 
 - One intersection, one lane mapped so far.
